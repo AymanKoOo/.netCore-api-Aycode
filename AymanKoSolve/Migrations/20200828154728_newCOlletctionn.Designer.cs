@@ -4,14 +4,16 @@ using AymanKoSolve.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AymanKoSolve.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200828154728_newCOlletctionn")]
+    partial class newCOlletctionn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,9 +143,8 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<string>("date")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
+                    b.Property<DateTime>("date")
+                        .HasColumnType("datetime2")
                         .HasMaxLength(200);
 
                     b.Property<int>("problemHeaderID")
@@ -163,9 +164,8 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("date")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
+                    b.Property<DateTime>("date")
+                        .HasColumnType("datetime2")
                         .HasMaxLength(200);
 
                     b.Property<string>("problemDescription")

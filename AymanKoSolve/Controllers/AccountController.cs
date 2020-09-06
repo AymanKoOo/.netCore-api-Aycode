@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using AymanKoSolve.Models;
@@ -13,18 +15,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AymanKoSolve.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [AllowAnonymous]
+
     public class AccountController : ControllerBase
     {
         private readonly ApplicationDbContext _db; //const intialize at compile time , readonly intialize at runtime
         private readonly UserManager<ApplicationUser> _manager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        
 
         public AccountController(ApplicationDbContext db, UserManager<ApplicationUser> manager,
             SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager)
@@ -33,6 +37,7 @@ namespace AymanKoSolve.Controllers
             _manager = manager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+     
         }
 
         [HttpPost]
@@ -116,57 +121,90 @@ namespace AymanKoSolve.Controllers
         }
 
 
+//        [HttpPost]
+//        [Route("Login")]
+//        public async Task<IActionResult> Login(Login model)
+//        {
+//            await createRole();
+//            await CreateAddmin();
+//            if (model==null)return NotFound();
+
+//            var user = await _manager.FindByEmailAsync(model.email);
+
+//            if(user==null) return NotFound();
+
+//            var result = await _signInManager.PasswordSignInAsync(user, model.passowrd, model.RememberMe, true);
+
+//            if (result.Succeeded)
+//            {
+//                if (await _roleManager.RoleExistsAsync("User"))
+//                {
+//                    if(!await _manager.IsInRoleAsync(user, "User") && !await _manager.IsInRoleAsync(user, "Admin"))
+//                    {
+//                        await _manager.AddToRoleAsync(user, "User");
+//                    }
+//                }
+                
+
+////HttpContext is an object that wraps all http related information into one place. HttpContext.Current is a context that has been created during the active request. Here is the list of some data that you can obtain from it.
+
+////    Request type (Post, Get)
+////    Request parameters (querystring, posted data)
+////    User's IP address
+////    Cookies
+
+////Further you can control your output through this object. In Items property, which is a dictionary, you can store instances of objects to ensure that they are created once for the request. You can control the output stream applying your custom filters.
+
+////This is a short list of that what you can do with this property.
+
+//                var roleName = await GertRoleNameByUserId(user.Id);
+//                if (roleName != null)
+//                {
+//                    AddCookies(user.UserName, roleName, user.Id, model.RememberMe);
+                    
+//                }
+//                    return Ok();
+//            }
+//            else if (result.IsLockedOut)
+//            {
+//                return Unauthorized("User account is locked");
+//            }
+//            else
+//            {
+//                return BadRequest(result.IsNotAllowed);
+//            }
+//        }
+
+
+
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login(Login model)
         {
-            await createRole();
-            await CreateAddmin();
-            if (model==null)return NotFound();
+            if (model == null) return NotFound();
 
             var user = await _manager.FindByEmailAsync(model.email);
 
-            if(user==null) return NotFound();
+            if (user != null && await _manager.CheckPasswordAsync(user,model.passowrd)) {
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.passowrd, model.RememberMe, true);
-
-            if (result.Succeeded)
-            {
-                if (await _roleManager.RoleExistsAsync("User"))
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    if(!await _manager.IsInRoleAsync(user, "User") && !await _manager.IsInRoleAsync(user, "Admin"))
+                    Subject = new ClaimsIdentity(new Claim[]
                     {
-                        await _manager.AddToRoleAsync(user, "User");
-                    }
-                }
-                
-
-//HttpContext is an object that wraps all http related information into one place. HttpContext.Current is a context that has been created during the active request. Here is the list of some data that you can obtain from it.
-
-//    Request type (Post, Get)
-//    Request parameters (querystring, posted data)
-//    User's IP address
-//    Cookies
-
-//Further you can control your output through this object. In Items property, which is a dictionary, you can store instances of objects to ensure that they are created once for the request. You can control the output stream applying your custom filters.
-
-//This is a short list of that what you can do with this property.
-
-                var roleName = await GertRoleNameByUserId(user.Id);
-                if (roleName != null)
-                {
-                    AddCookies(user.UserName, roleName, user.Id, model.RememberMe);
-                    
-                }
-                    return Ok();
+                      new Claim("UserID",user.Id.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(5),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890123456")), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.WriteToken(securityToken);
+                return Ok(new {token});
             }
-            else if (result.IsLockedOut)
-            {
-                return Unauthorized("User account is locked");
-            }
+
             else
             {
-                return BadRequest(result.IsNotAllowed);
+                return BadRequest(new { message = "Email or pwa is incorrect" });
             }
         }
 
@@ -180,8 +218,9 @@ namespace AymanKoSolve.Controllers
             return null;
         }
 
-        [Authorize]
+        
         [HttpGet]
+        [Authorize]
         [Route("GetAllusers")]
         public async Task<ActionResult<IEnumerable<ApplicationUser>>> allUsers()
         {

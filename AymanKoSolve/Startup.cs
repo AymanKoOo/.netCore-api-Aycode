@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using AymanKoSolve.Hubs;
 using AymanKoSolve.Models;
 using AymanKoSolve.repo.Admin;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AymanKoSolve
 {
@@ -52,22 +56,46 @@ namespace AymanKoSolve
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //})
 
-            .AddCookie(options =>
-             {
-                 options.Cookie.HttpOnly = true;
-                 options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                 options.LogoutPath = "/Account/Logout";
-                 options.SlidingExpiration = true;
-             });
+            //.AddCookie(options =>
+            // {
+            //     options.Cookie.HttpOnly = true;
+            //     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            //     options.LogoutPath = "/Account/Logout";
+            //     options.SlidingExpiration = true;
+            // });
 
                 services.AddCors();
+
+            services.AddSignalR();
+            var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_SECRET"].ToString());
+            //JWT///
+
+            services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x => { 
+
+              x.RequireHttpsMetadata = false;
+              x.SaveToken = false;
+                x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         }
 
       
@@ -83,11 +111,14 @@ namespace AymanKoSolve
              app.UseHttpsRedirection();
              app.UseAuthentication();
              app.UseCookiePolicy();
-             app.UseAuthorization();
-             app.UseCors(x => x.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+
+            app.UseAuthorization();
+             app.UseCors(x => x.WithOrigins(Configuration["ApplicationSettings:ClientUrl"].ToString()).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
              app.UseEndpoints(endpoints =>
              {
-                endpoints.MapControllers();
+                 endpoints.MapHub<ChatHub>("/chatsocket");     // path will look like this https://localhost:44379/chatsocket 
+
+                 endpoints.MapControllers();
              });
         }
     }

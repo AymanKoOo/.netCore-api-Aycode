@@ -4,14 +4,16 @@ using AymanKoSolve.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AymanKoSolve.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200822000952_createProbCorre")]
+    partial class createProbCorre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,11 +123,6 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
                     b.Property<string>("contentProblemDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(200)")
@@ -141,17 +138,16 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<string>("date")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
+                    b.Property<DateTime>("date")
+                        .HasColumnType("datetime2")
                         .HasMaxLength(200);
 
-                    b.Property<int>("problemHeaderID")
+                    b.Property<int>("problemid")
                         .HasColumnType("int");
 
                     b.HasKey("contentProblemid");
 
-                    b.HasIndex("problemHeaderID");
+                    b.HasIndex("problemid");
 
                     b.ToTable("problemContents");
                 });
@@ -163,9 +159,13 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("date")
+                    b.Property<string>("code")
                         .IsRequired()
                         .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.Property<DateTime>("date")
+                        .HasColumnType("datetime2")
                         .HasMaxLength(200);
 
                     b.Property<string>("problemDescription")
@@ -205,11 +205,6 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("problemSourceImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
                     b.Property<string>("sourceDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(200)")
@@ -233,11 +228,6 @@ namespace AymanKoSolve.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("problemTDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
-                    b.Property<string>("problemTypeImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
@@ -359,8 +349,8 @@ namespace AymanKoSolve.Migrations
             modelBuilder.Entity("AymanKoSolve.Models.problemContent", b =>
                 {
                     b.HasOne("AymanKoSolve.Models.problemHeader", "problemHeader")
-                        .WithMany("problemContent")
-                        .HasForeignKey("problemHeaderID")
+                        .WithMany()
+                        .HasForeignKey("problemid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -368,13 +358,13 @@ namespace AymanKoSolve.Migrations
             modelBuilder.Entity("AymanKoSolve.Models.problemHeader", b =>
                 {
                     b.HasOne("AymanKoSolve.Models.problemSource", "problemSource")
-                        .WithMany("problemHeader")
+                        .WithMany()
                         .HasForeignKey("problemSourceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AymanKoSolve.Models.problemType", "ProblemType")
-                        .WithMany("problemHeader")
+                        .WithMany()
                         .HasForeignKey("problemTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
