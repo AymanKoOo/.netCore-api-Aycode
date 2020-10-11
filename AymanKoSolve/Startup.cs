@@ -1,23 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using AymanKoSolve.Hubs;
 using AymanKoSolve.Models;
 using AymanKoSolve.repo.Admin;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using AymanKoSolve.repo.Chat;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AymanKoSolve
@@ -35,6 +31,8 @@ namespace AymanKoSolve
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IAdminRepo,AdminRepo>();
+            services.AddTransient<IChatRepo, ChatRepo>();
+          
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
@@ -71,7 +69,7 @@ namespace AymanKoSolve
             //     options.SlidingExpiration = true;
             // });
 
-                services.AddCors();
+            services.AddCors();
 
             services.AddSignalR();
             var key = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_SECRET"].ToString());

@@ -23,6 +23,20 @@ namespace AymanKoSolve.Models
         public DbSet<problemSource> problemSources { get; set; }
 
         public DbSet<problemType> problemTypes { get; set; }
+        /// <summary>
+        /// /Chat
+        /// </summary>
+        public DbSet<Chatt> Chat { get; set; }
+        public DbSet<Message> Message { get; set; }
+
+        public DbSet<ChatUser> ChatUser { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<ChatUser>()
+                .HasKey(x => new { x.ChatId, x.UserId });
+        }
 
     }
 }

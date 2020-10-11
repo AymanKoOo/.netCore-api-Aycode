@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using AymanKoSolve.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,25 +10,50 @@ namespace AymanKoSolve.Hubs
 {
     public class ChatHub:Hub
     {
-        public Task SendMessage1(string user, string message)// Two parameters accepted
-        {
-            return Clients.All.SendAsync("ReceiveOne", user, message);    // Note this 'ReceiveOne' 
-        }
+      
         public override async Task OnConnectedAsync()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, "group1");
+            await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "group1");
+            await Clients.All.SendAsync("UserDisconnected", Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task BroadcastText(string message)
+        /////Code Editor/////
+       
+
+        public Task codeEditor(string msg)
         {
-            await Clients.OthersInGroup("group1").SendAsync("ReceiveText", message);
+            return Clients.All.SendAsync("ReceiveText", msg);
         }
+
+
+        /// Send Message to All
+        public Task SendMessageToAll(string msg)
+        {
+            return Clients.All.SendAsync("ReceiveText", msg);
+        }
+
+        // Send Message to specific user using  connection ID
+        public Task SendMessageToUser(string connectionId, string msg)
+        {
+            //text = text + msg.msgText;
+            return Clients.Client(connectionId).SendAsync("ReceiveText", msg);
+        }
+
+        public Task joingroup(string group)
+        {
+           return  Groups.AddToGroupAsync(Context.ConnectionId, group);
+        }
+
+        public Task SendMessageToGroup(string group, string message)
+        {
+            return Clients.Group(group).SendAsync("ReceiveText", message);       
+        }
+
     }
 }

@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 
 namespace AymanKoSolve.Models
 {
-
-    public class MessageDto
-    {
-        public string user { get; set; }
-        public string msgText { get; set; }
-    }
+  
+        public enum ChatType
+        {
+            Room,
+            Private
+        }
+  
 }

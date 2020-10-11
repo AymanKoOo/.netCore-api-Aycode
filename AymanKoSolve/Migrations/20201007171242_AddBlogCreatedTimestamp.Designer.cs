@@ -4,14 +4,16 @@ using AymanKoSolve.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AymanKoSolve.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201007171242_AddBlogCreatedTimestamp")]
+    partial class AddBlogCreatedTimestamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +56,7 @@ namespace AymanKoSolve.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ChattId")
+                    b.Property<int?>("ChatId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -106,7 +108,7 @@ namespace AymanKoSolve.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChattId");
+                    b.HasIndex("ChatId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -119,30 +121,12 @@ namespace AymanKoSolve.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("AymanKoSolve.Models.ChatUser", b =>
-                {
-                    b.Property<int>("ChatId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ChatId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ChatUser");
-                });
-
-            modelBuilder.Entity("AymanKoSolve.Models.Chatt", b =>
+            modelBuilder.Entity("AymanKoSolve.Models.Chat", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -159,7 +143,7 @@ namespace AymanKoSolve.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ChatId")
+                    b.Property<int?>("ChatId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -422,33 +406,16 @@ namespace AymanKoSolve.Migrations
 
             modelBuilder.Entity("AymanKoSolve.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("AymanKoSolve.Models.Chatt", null)
+                    b.HasOne("AymanKoSolve.Models.Chat", null)
                         .WithMany("Users")
-                        .HasForeignKey("ChattId");
-                });
-
-            modelBuilder.Entity("AymanKoSolve.Models.ChatUser", b =>
-                {
-                    b.HasOne("AymanKoSolve.Models.Chatt", "chat")
-                        .WithMany()
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AymanKoSolve.Models.ApplicationUser", "user")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChatId");
                 });
 
             modelBuilder.Entity("AymanKoSolve.Models.Message", b =>
                 {
-                    b.HasOne("AymanKoSolve.Models.Chatt", "Chat")
+                    b.HasOne("AymanKoSolve.Models.Chat", null)
                         .WithMany("Message")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChatId");
                 });
 
             modelBuilder.Entity("AymanKoSolve.Models.problemContent", b =>
