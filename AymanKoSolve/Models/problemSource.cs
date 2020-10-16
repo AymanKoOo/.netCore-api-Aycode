@@ -9,7 +9,7 @@ namespace AymanKoSolve.Models
 {
     public class problemSource
     {
-        [JsonIgnore]
+      
         [Key]
         public int problemSourceID { get; set; }
 

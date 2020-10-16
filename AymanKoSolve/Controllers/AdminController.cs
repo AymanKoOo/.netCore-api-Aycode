@@ -124,7 +124,7 @@ namespace AymanKoSolve.Controllers
         
         [Route("GetAllprobSource")]
         [HttpGet]
-        public async Task<IEnumerable<problemSource>> GetAllprobSource()
+        public async Task<object> GetAllprobSource()
         {
             var sources = await _rep.GetAllprobSource();
             if (sources == null)
@@ -216,7 +216,7 @@ namespace AymanKoSolve.Controllers
         //////////////////////////////////
         [Route("AddprobHeader")]
         [HttpPost]
-        public async Task<ActionResult> AddprobHeader(problemHeader model)
+        public async Task<ActionResult> AddprobHeader([FromBody] addProblemHeader model)
         {
             if (model == null) return NotFound();
             var result = await _rep.AddprobHeader(model);
@@ -283,7 +283,7 @@ namespace AymanKoSolve.Controllers
         /// //////////////////////////////////
         [Route("Addprobcontent")]
         [HttpPost]
-        public async Task<ActionResult> Addprobcontent(problemContent model)
+        public async Task<ActionResult> Addprobcontent([FromBody] problemContent model)
         {
             if (model == null) return NotFound();
             var result = await _rep.Addprobcontent(model);

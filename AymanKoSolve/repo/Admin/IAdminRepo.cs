@@ -32,7 +32,7 @@ namespace AymanKoSolve.repo.Admin
 
         Task<problemSource> GetprobSource(int sourceId);
 
-        Task<IEnumerable<problemSource>> GetAllprobSource();
+        Task<object> GetAllprobSource();
 
         /////////////////////////////////////
         ///
@@ -48,7 +48,7 @@ namespace AymanKoSolve.repo.Admin
         Task<IEnumerable<problemType>> GetAllprobType();
 
         /////////////Problem Header////////////////////////
-        Task<problemHeader> AddprobHeader(problemHeader model);
+        Task<problemHeader> AddprobHeader(addProblemHeader model);
 
         Task<problemHeader> EditprobHeader(problemHeader model);
 

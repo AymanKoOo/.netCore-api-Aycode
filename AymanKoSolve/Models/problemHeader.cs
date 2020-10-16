@@ -13,17 +13,16 @@ namespace AymanKoSolve.Models
         [Key]
         public int problemid { get; set; }
 
-        [Required, StringLength(200)]
         public string problemName { get; set; }
 
-        [Required, StringLength(200)]
+      
         public string problemDescription { get; set; }
 
-        [Required, StringLength(200)]
+  
         public string problemImage { get; set; }
 
 
-        [Required, StringLength(200)]
+      
         public string date { get; set; }
        
     

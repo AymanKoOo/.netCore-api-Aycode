@@ -61,11 +61,18 @@ namespace AymanKoSolve.repo.Admin
             await _db.SaveChangesAsync();
             return probSource;
         }
-        public async Task<IEnumerable<problemSource>> GetAllprobSource()
+        public async Task<object> GetAllprobSource()
         {
-            var sources = _db.problemSources.ToListAsync();
-            if (sources != null) return await sources;
-            return null;
+          //  var sources = _db.problemSources.ToListAsync();
+            var sources = await (from a in _db.problemSources
+                
+                             select new
+                             {
+                                 sourceName = a.sourceName,
+                                 problemSourceImage = a.problemSourceImage,
+                                 sourceDescription = a.sourceDescription,
+                             }).ToListAsync();
+            return sources;
         }
 
 
@@ -256,6 +263,7 @@ namespace AymanKoSolve.repo.Admin
         public async Task<IEnumerable<problemType>> GetAllprobType()
         {
             var probType = _db.problemTypes.ToListAsync();
+            
             if (probType != null) return await probType;
             return null;
         }
@@ -264,13 +272,19 @@ namespace AymanKoSolve.repo.Admin
         ///            Problem Header           ///
         /// ///////////////////////////////////////
         
-        public async Task<problemHeader> AddprobHeader(problemHeader model)
+        public async Task<problemHeader> AddprobHeader(addProblemHeader model)
         {
             if (model == null) return null;
 
+
+            var probTypeIDobj = _db.problemTypes.Where(x => x.problemTypee == model.problemType).Select(x => new { x.problemTypeID });
+            int problemTypeIDD = probTypeIDobj.FirstOrDefault().problemTypeID;
+
+            var probSoruceIDobj = _db.problemSources.Where(x=>x.sourceName==model.problemSource).Select(x => new { x.problemSourceID });
+            int problemSourceIDD = probSoruceIDobj.FirstOrDefault().problemSourceID;
+
             var problemHeadr = new problemHeader
             {
-
                 problemName = model.problemName,
 
                 problemDescription = model.problemDescription,
@@ -279,10 +293,8 @@ namespace AymanKoSolve.repo.Admin
 
                 date = model.date,
 
-                problemTypeID = model.problemTypeID,
-
-                problemSourceID = model.problemSourceID
-
+                problemTypeID = problemTypeIDD,
+                problemSourceID = problemSourceIDD
             };
             var result = await _db.AddAsync(problemHeadr);
             await _db.SaveChangesAsync();

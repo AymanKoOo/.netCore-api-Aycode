@@ -23,7 +23,7 @@ namespace AymanKoSolve.Models
         [Required, StringLength(200)]
         public string contentproblemImage { get; set; }
 
-        [Required, StringLength(200)]
+        [Required]
         public string code { get; set; }
 
         [Required, StringLength(200)]
