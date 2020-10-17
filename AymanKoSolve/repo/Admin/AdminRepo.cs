@@ -597,5 +597,35 @@ namespace AymanKoSolve.repo.Admin
 
             return res;
         }
+
+        public string GetUserRole(string id)
+        {
+            var roleIdOb =  _db.UserRoles.Where(x => x.UserId == id).Select(x => new { x.RoleId });
+            string roleID = roleIdOb.FirstOrDefault().RoleId;
+            var roleNameOb =  _db.Roles.Where(x => x.Id == roleID).Select(x => new { x.Name });
+            string roleName = roleNameOb.FirstOrDefault().Name;
+
+            if (roleName == null)
+            {
+                return null;
+            }
+             return roleName;
+        }
+
+        public async Task<object> GetAllUserData(string userId)
+        {
+            var user = await (from u1 in _db.Users
+                             where u1.Id == userId
+                             select new
+                             {
+                                 Email = u1.Email,
+                                 EmailConfirmed = u1.EmailConfirmed,
+                                 Country = u1.Country,
+                                 PicPath = u1.PicPath,
+                                 UserName = u1.UserName,
+                             }).ToListAsync();
+
+            return user;
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace AymanKoSolve.Controllers
         //{
         //    text = text + msg.msgText;
         //    _hubContext.Clients.All.SendAsync("ReceiveText", text);
-           
+
         //    return Ok();
         //}
 
@@ -60,7 +60,7 @@ namespace AymanKoSolve.Controllers
 
         //    return Ok();
         //}
-        
+
         //[Route("GetConnectionId")]                                           //path looks like this: https://localhost:44379/api/chat/send
         //[HttpGet]
         //public string GetConnectionId()

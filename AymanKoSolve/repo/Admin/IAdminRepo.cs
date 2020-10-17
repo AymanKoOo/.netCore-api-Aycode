@@ -76,7 +76,9 @@ namespace AymanKoSolve.repo.Admin
         Task<object> GetprobHeaderJ(string probType,string probSource);
         Task<object> GetprobContentJ(string probHeaderName);
 
+        string GetUserRole(string id);
 
+        Task<object> GetAllUserData(string userID);
 
     }
 }

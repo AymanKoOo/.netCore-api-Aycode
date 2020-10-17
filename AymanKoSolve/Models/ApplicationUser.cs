@@ -9,6 +9,9 @@ namespace AymanKoSolve.Models
     public class ApplicationUser:IdentityUser
     {
         public string Country { get; set; }
+
+        public string PicPath { get; set; }
+
         public ICollection<ChatUser> chats { get; set; }
     }
 }

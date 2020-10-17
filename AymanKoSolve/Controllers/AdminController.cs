@@ -371,6 +371,45 @@ namespace AymanKoSolve.Controllers
             return sources;
         }
 
+        [AllowAnonymous]
+        [Route("IsAdmin")]
+        [HttpGet]
+        public bool IsAdmin()
+        {
+            var currentUser = HttpContext.User;
+            string UserID="";
+     
+            if (currentUser.HasClaim(c => c.Type == "UserID"))
+            {
+                 UserID = currentUser.Claims.FirstOrDefault(c => c.Type == "UserID").Value;
+            }
+
+            string UserRoleName = _rep.GetUserRole(UserID);
+
+            if (UserRoleName == "Admin") return true;
+            else return false;
+        }
+
+
         
+        [Route("GetAllUserData")]
+        [HttpGet]
+        public async Task<object> GetAllUserData()
+        {
+            var currentUser = HttpContext.User;
+            string UserID = "";
+
+            if (currentUser.HasClaim(c => c.Type == "UserID"))
+            {
+                UserID = currentUser.Claims.FirstOrDefault(c => c.Type == "UserID").Value;
+            }
+
+            var user =await _rep.GetAllUserData(UserID);
+
+            if (user == null) return null;
+            return user;
+        }
+
+
     }
 }

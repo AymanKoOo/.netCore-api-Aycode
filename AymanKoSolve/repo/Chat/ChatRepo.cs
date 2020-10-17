@@ -81,12 +81,13 @@ namespace AymanKoSolve.repo.Chat
                 ChatId = chatId,
                 Timestamp = DateTime.Now
             };
-
+          
             var result = _db.Message.AddAsync(message);
             await _db.SaveChangesAsync();
             return message;
         }
 
         
+
     }
 }
