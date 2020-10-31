@@ -121,7 +121,6 @@ namespace AymanKoSolve.Controllers
             return BadRequest();
         }
 
-        
         [Route("GetAllprobSource")]
         [HttpGet]
         public async Task<object> GetAllprobSource()

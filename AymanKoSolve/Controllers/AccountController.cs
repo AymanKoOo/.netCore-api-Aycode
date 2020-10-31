@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using System.Web;
 using AymanKoSolve.Models;
 using AymanKoSolve.ModelViews;
+using AymanKoSolve.repo.email;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -28,16 +30,16 @@ namespace AymanKoSolve.Controllers
         private readonly UserManager<ApplicationUser> _manager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        
+        private readonly IEmail _em;
 
-        public AccountController(ApplicationDbContext db, UserManager<ApplicationUser> manager,
-            SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager)
+        public AccountController(IEmail em, ApplicationDbContext db, UserManager<ApplicationUser> manager,
+            SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager )
         {
             _db = db;
             _manager = manager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-     
+            _em = em;
         }
 
         [HttpPost]
@@ -71,13 +73,27 @@ namespace AymanKoSolve.Controllers
                 var result = await _manager.CreateAsync(user,model.Password);
                 if (result.Succeeded)
                 {
-
                     var token = await _manager.GenerateEmailConfirmationTokenAsync(user);
-                    var confirmLink = Url.Action("RegisterationConfirm", "Account", new
-                    {ID = user.Id, Token = HttpUtility.UrlEncode(token)}, Request.Scheme);
+                    //var confirmLink = Url.Action("RegisterationConfirm", "Account", new
+                    //{ID = user.Id, Token = HttpUtility.UrlEncode(token)}, Request.Scheme);
                     //send email with link of controler + token
+                    var encodeToken = Encoding.UTF8.GetBytes(token);
+                    var newToken = WebEncoders.Base64UrlEncode(encodeToken);
+                    var confirmLink = "http://localhost:8080/verify?ID=" + user.Id + "&Token=" + newToken;
+
+                    try
+                    {
+                        _em.Send("mohamednaser9851@gmail.com", model.Email, "AyCode Verify", confirmLink);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return BadRequest(result.Errors);
+                    }
+
+
                     //when he click he goes to this controler and change to verfied
-                    return Ok(confirmLink);
+                    return Ok();
                 }
                 else
                 {
@@ -97,6 +113,17 @@ namespace AymanKoSolve.Controllers
             return _db.Users.Any(x => x.Email == email);
         }
 
+
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public  ActionResult<string> RegisterationConfirm(int id)
+        {
+            var user = this.User;
+            return "value";
+        }
+
+
         [HttpGet]
         [Route("RegisterationConfirm")]
         public async Task<IActionResult> RegisterationConfirm(string ID,string Token)
@@ -106,7 +133,10 @@ namespace AymanKoSolve.Controllers
             var user = await _manager.FindByIdAsync(ID);
             if (user == null) return NotFound();
 
-            var result = await _manager.ConfirmEmailAsync(user, HttpUtility.UrlDecode(Token));
+            var newToken = WebEncoders.Base64UrlDecode(Token);
+            var encodeToken = Encoding.UTF8.GetString(newToken);
+
+            var result = await _manager.ConfirmEmailAsync(user, encodeToken);
 
             if (result.Succeeded)
             {
@@ -121,61 +151,74 @@ namespace AymanKoSolve.Controllers
         }
 
 
-//        [HttpPost]
-//        [Route("Login")]
-//        public async Task<IActionResult> Login(Login model)
-//        {
-//            await createRole();
-//            await CreateAddmin();
-//            if (model==null)return NotFound();
+        //        [HttpPost]
+        //        [Route("Login")]
+        //        public async Task<IActionResult> Login(Login model)
+        //        {
+        //            await createRole();
+        //            await CreateAddmin();
+        //            if (model==null)return NotFound();
 
-//            var user = await _manager.FindByEmailAsync(model.email);
+        //            var user = await _manager.FindByEmailAsync(model.email);
 
-//            if(user==null) return NotFound();
+        //            if(user==null) return NotFound();
 
-//            var result = await _signInManager.PasswordSignInAsync(user, model.passowrd, model.RememberMe, true);
+        //            var result = await _signInManager.PasswordSignInAsync(user, model.passowrd, model.RememberMe, true);
 
-//            if (result.Succeeded)
-//            {
-//                if (await _roleManager.RoleExistsAsync("User"))
-//                {
-//                    if(!await _manager.IsInRoleAsync(user, "User") && !await _manager.IsInRoleAsync(user, "Admin"))
-//                    {
-//                        await _manager.AddToRoleAsync(user, "User");
-//                    }
-//                }
-                
-
-////HttpContext is an object that wraps all http related information into one place. HttpContext.Current is a context that has been created during the active request. Here is the list of some data that you can obtain from it.
-
-////    Request type (Post, Get)
-////    Request parameters (querystring, posted data)
-////    User's IP address
-////    Cookies
-
-////Further you can control your output through this object. In Items property, which is a dictionary, you can store instances of objects to ensure that they are created once for the request. You can control the output stream applying your custom filters.
-
-////This is a short list of that what you can do with this property.
-
-//                var roleName = await GertRoleNameByUserId(user.Id);
-//                if (roleName != null)
-//                {
-//                    AddCookies(user.UserName, roleName, user.Id, model.RememberMe);
-                    
-//                }
-//                    return Ok();
-//            }
-//            else if (result.IsLockedOut)
-//            {
-//                return Unauthorized("User account is locked");
-//            }
-//            else
-//            {
-//                return BadRequest(result.IsNotAllowed);
-//            }
-//        }
+        //            if (result.Succeeded)
+        //            {
+        //                if (await _roleManager.RoleExistsAsync("User"))
+        //                {
+        //                    if(!await _manager.IsInRoleAsync(user, "User") && !await _manager.IsInRoleAsync(user, "Admin"))
+        //                    {
+        //                        await _manager.AddToRoleAsync(user, "User");
+        //                    }
+        //                }
 
 
+        ////HttpContext is an object that wraps all http related information into one place. HttpContext.Current is a context that has been created during the active request. Here is the list of some data that you can obtain from it.
+
+        ////    Request type (Post, Get)
+        ////    Request parameters (querystring, posted data)
+        ////    User's IP address
+        ////    Cookies
+
+        ////Further you can control your output through this object. In Items property, which is a dictionary, you can store instances of objects to ensure that they are created once for the request. You can control the output stream applying your custom filters.
+
+        ////This is a short list of that what you can do with this property.
+
+        //                var roleName = await GertRoleNameByUserId(user.Id);
+        //                if (roleName != null)
+        //                {
+        //                    AddCookies(user.UserName, roleName, user.Id, model.RememberMe);
+
+        //                }
+        //                    return Ok();
+        //            }
+        //            else if (result.IsLockedOut)
+        //            {
+        //                return Unauthorized("User account is locked");
+        //            }
+        //            else
+        //            {
+        //                return BadRequest(result.IsNotAllowed);
+        //            }
+        //        }
+
+
+
+
+
+        ////
+        ///
+        /// 
+        /// 
+   
+     
+        /// <summary>
+        /// /
+        /// </summary>
+        ////// <returns></returns>
 
         [HttpPost]
         [Route("Login")]

@@ -19,7 +19,5 @@ namespace AymanKoSolve.repo.Chat
 
         Task<Message> CreateMessage(int chatId,string messsage);
 
-
-
     }
 }

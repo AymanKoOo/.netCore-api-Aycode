@@ -4,6 +4,8 @@ using AymanKoSolve.Hubs;
 using AymanKoSolve.Models;
 using AymanKoSolve.repo.Admin;
 using AymanKoSolve.repo.Chat;
+using AymanKoSolve.repo.email;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +34,7 @@ namespace AymanKoSolve
         {
             services.AddTransient<IAdminRepo,AdminRepo>();
             services.AddTransient<IChatRepo, ChatRepo>();
+            services.AddTransient<IEmail, email>();
           
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -78,6 +81,8 @@ namespace AymanKoSolve
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.AddAuthentication(x =>
             {
+                x.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -93,7 +98,14 @@ namespace AymanKoSolve
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
                 };
-            });
+            }).AddGoogle(x=>
+            {
+                IConfigurationSection googleAuthNSection =
+               Configuration.GetSection("Authentication:Google");
+
+                x.ClientId = "1086014411471-m3ve9rhi6ks07u3hs1ek6lcbcllc3apf.apps.googleusercontent.com";
+                x.ClientSecret = "3WKZLaUdliVfe5AiwGcbLUYr";
+            } );
         }
 
       
