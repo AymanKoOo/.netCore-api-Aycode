@@ -382,7 +382,7 @@ namespace AymanKoSolve.Controllers
             {
                  UserID = currentUser.Claims.FirstOrDefault(c => c.Type == "UserID").Value;
             }
-
+            if (UserID == "") return false;
             string UserRoleName = _rep.GetUserRole(UserID);
 
             if (UserRoleName == "Admin") return true;

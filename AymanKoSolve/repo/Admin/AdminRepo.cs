@@ -601,7 +601,9 @@ namespace AymanKoSolve.repo.Admin
         public string GetUserRole(string id)
         {
             var roleIdOb =  _db.UserRoles.Where(x => x.UserId == id).Select(x => new { x.RoleId });
+            
             string roleID = roleIdOb.FirstOrDefault().RoleId;
+            if (roleID == null) return null;
             var roleNameOb =  _db.Roles.Where(x => x.Id == roleID).Select(x => new { x.Name });
             string roleName = roleNameOb.FirstOrDefault().Name;
 
