@@ -151,69 +151,7 @@ namespace AymanKoSolve.Controllers
         }
 
 
-        //        [HttpPost]
-        //        [Route("Login")]
-        //        public async Task<IActionResult> Login(Login model)
-        //        {
-        //            await createRole();
-        //            await CreateAddmin();
-        //            if (model==null)return NotFound();
 
-        //            var user = await _manager.FindByEmailAsync(model.email);
-
-        //            if(user==null) return NotFound();
-
-        //            var result = await _signInManager.PasswordSignInAsync(user, model.passowrd, model.RememberMe, true);
-
-        //            if (result.Succeeded)
-        //            {
-        //                if (await _roleManager.RoleExistsAsync("User"))
-        //                {
-        //                    if(!await _manager.IsInRoleAsync(user, "User") && !await _manager.IsInRoleAsync(user, "Admin"))
-        //                    {
-        //                        await _manager.AddToRoleAsync(user, "User");
-        //                    }
-        //                }
-
-
-        ////HttpContext is an object that wraps all http related information into one place. HttpContext.Current is a context that has been created during the active request. Here is the list of some data that you can obtain from it.
-
-        ////    Request type (Post, Get)
-        ////    Request parameters (querystring, posted data)
-        ////    User's IP address
-        ////    Cookies
-
-        ////Further you can control your output through this object. In Items property, which is a dictionary, you can store instances of objects to ensure that they are created once for the request. You can control the output stream applying your custom filters.
-
-        ////This is a short list of that what you can do with this property.
-
-        //                var roleName = await GertRoleNameByUserId(user.Id);
-        //                if (roleName != null)
-        //                {
-        //                    AddCookies(user.UserName, roleName, user.Id, model.RememberMe);
-
-        //                }
-        //                    return Ok();
-        //            }
-        //            else if (result.IsLockedOut)
-        //            {
-        //                return Unauthorized("User account is locked");
-        //            }
-        //            else
-        //            {
-        //                return BadRequest(result.IsNotAllowed);
-        //            }
-        //        }
-
-
-
-
-
-        ////
-        ///
-        /// 
-        /// 
-   
      
         /// <summary>
         /// /

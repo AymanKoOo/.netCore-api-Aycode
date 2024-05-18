@@ -62,7 +62,6 @@ namespace AymanKoSolve.Controllers
             {
                return Ok();
             }
-            //return BadRequest();
             return BadRequest();
         }
 
@@ -78,7 +77,6 @@ namespace AymanKoSolve.Controllers
             {
                 return Ok();
             }
-            //return BadRequest();
             return BadRequest();
         }
 
